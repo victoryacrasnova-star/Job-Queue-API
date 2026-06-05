@@ -8,9 +8,6 @@ class Job(Base):
     __tablename__ = 'jobs'
 
     id = Column(Integer, primary_key=True)
-
-    # все что ниже - под вопросом
-
     type = Column(String, nullable=False) # тип задачи
     status = Column(String, nullable=False, default="queued") # статус
     payload = Column(JSON, nullable=False) # входные данные задачи
