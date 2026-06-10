@@ -6,12 +6,17 @@ from app.schemas import JobRead, JobCreate
 from app.crud import create_job as create_job_crud
 from app.crud import get_job as get_job_crud
 from app.crud import list_jobs as list_jobs_crud
+from app.redis_client import enqueue_job
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 
 @router.post("", response_model=JobRead, status_code=status.HTTP_201_CREATED)
 def create_job(job_data: JobCreate, db: Session = Depends(get_db)) -> JobRead:
-    return create_job_crud(db, job_data)
+    job = create_job_crud(db, job_data)
+
+    enqueue_job(job.id)
+
+    return job
 
 @router.get("",response_model=list[JobRead])
 def get_jobs(db: Session = Depends(get_db)) -> list[JobRead]:
