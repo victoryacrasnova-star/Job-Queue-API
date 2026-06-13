@@ -29,5 +29,21 @@ def process_next_job():
             JobStatusEnum.processing,
         )
 
+        try:
+            result = {
+                "message": "Job processed successfully",
+            }
+
+            set_job_result(db, job, result)
+
+            set_job_status(db,
+                           job,
+                           JobStatusEnum.done)
+
+        except Exception as error:
+            set_job_error(db, job, str(error))
+            set_job_status(db,
+                           job,
+                           JobStatusEnum.failed)
     finally:
         db.close()
