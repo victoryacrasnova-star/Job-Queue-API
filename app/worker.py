@@ -1,3 +1,5 @@
+import httpx
+
 from app.crud import (
     get_job,
     set_job_status,
@@ -30,9 +32,18 @@ def process_next_job():
         )
 
         try:
-            result = {
-                "message": "Job processed successfully",
-            }
+
+            if job.type == "site_check":
+                url = job.payload.get("url")
+                if not url:
+                    raise ValueError("url is required for site_chek job")
+
+                response = httpx.get(url, timeout=10)
+                result = {
+                    "status_code": response.status_code,
+                }
+            else:
+                raise ValueError(f"Unknown job type: {job.type}")
 
             set_job_result(db, job, result)
 
@@ -47,3 +58,6 @@ def process_next_job():
                            JobStatusEnum.failed)
     finally:
         db.close()
+
+if __name__ == "__main__":
+    process_next_job()
