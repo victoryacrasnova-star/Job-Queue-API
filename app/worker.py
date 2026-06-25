@@ -1,3 +1,5 @@
+import time
+
 import httpx
 
 from app.crud import (
@@ -60,4 +62,6 @@ def process_next_job():
         db.close()
 
 if __name__ == "__main__":
-    process_next_job()
+    while True:
+        process_next_job()
+        time.sleep(2)
